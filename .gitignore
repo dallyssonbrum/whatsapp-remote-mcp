@@ -1,3 +1,15 @@
 *.db
-claude_desktop_config.json
-whatsapp.log
+*.db-journal
+*.db-shm
+*.db-wal
+whatsapp-bridge/bridge_log.txt
+.gemini/
+.env
+__pycache__/
+*.pyc
+node_modules/
+tokens/
+.vs/
+.vscode/
+bin/
+obj/
