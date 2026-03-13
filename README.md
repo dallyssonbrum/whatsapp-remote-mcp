@@ -1,4 +1,4 @@
-# WhatsApp MCP Server (Brum Edition)
+# WhatsApp MCP Server (Custom Edition)
 
 [Leia em Português (PT-BR)](./README_PTBR.md)
 
@@ -31,8 +31,8 @@ Here's an example of what you can do when it's connected to Claude.
 1. **Clone this repository**
 
    ```bash
-   git clone https://github.com/lharries/whatsapp-mcp.git
-   cd whatsapp-mcp
+   git clone https://github.com/dallyssonbrum/whatsapp-remote-mcp.git
+   cd whatsapp-remote-mcp
    ```
 
 2. **Run the WhatsApp bridge**
@@ -41,7 +41,7 @@ Here's an example of what you can do when it's connected to Claude.
 
    ```bash
    cd whatsapp-bridge
-   go run main.go
+   go run .
    ```
 
    The first time you run it, you will be prompted to scan a QR code. Scan the QR code with your WhatsApp mobile app to authenticate.
@@ -59,7 +59,7 @@ Here's an example of what you can do when it's connected to Claude.
          "command": "{{PATH_TO_UV}}", // Run `which uv` and place the output here
          "args": [
            "--directory",
-           "{{PATH_TO_SRC}}/whatsapp-mcp/whatsapp-mcp-server", // cd into the repo, run `pwd` and enter the output here + "/whatsapp-mcp-server"
+           "{{PATH_TO_SRC}}/whatsapp-remote-mcp/whatsapp-mcp-server", // cd into the repo, run `pwd` and enter the output here + "/whatsapp-mcp-server"
            "run",
            "main.py"
          ]
@@ -84,13 +84,7 @@ Here's an example of what you can do when it's connected to Claude.
 
    Open Claude Desktop and you should now see WhatsApp as an available integration.
 
-   Or restart Cursor.
-
-### Windows Compatibility
-
-... (conteúdo anterior) ...
-
-## 🚀 Remote Control Mode (Brum Edition)
+## 🚀 Remote Control Mode (Custom Edition)
 
 This version includes a custom **Remote Control** feature that allows you to control your PC via WhatsApp messages.
 

@@ -1,4 +1,4 @@
-# Servidor MCP de WhatsApp (Edição Brum)
+# Servidor MCP de WhatsApp (Edição Customizada)
 
 Este é um servidor Model Context Protocol (MCP) para o WhatsApp.
 
@@ -10,7 +10,7 @@ Ele se conecta diretamente à sua **conta pessoal do WhatsApp** via API Web mult
 
 ---
 
-## 🚀 Modo Controle Remoto (Edição Brum)
+## 🚀 Modo Controle Remoto (Edição Customizada)
 
 Esta versão inclui um recurso personalizado de **Controle Remoto** que permite controlar seu PC através de mensagens do WhatsApp.
 
@@ -98,4 +98,4 @@ O agente terá acesso às seguintes funções:
 *   **Banco de dados travado (SQLITE_BUSY)**: No Windows, evite que dois processos tentem escrever no banco ao mesmo tempo. Use o monitoramento via logs (`remote_wait.py`) para evitar conflitos.
 
 ---
-*Desenvolvido por Brum & Gemini CLI.*
+*Desenvolvido pela Comunidade & Gemini CLI.*

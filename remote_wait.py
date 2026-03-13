@@ -4,7 +4,7 @@ import os
 # --- CONFIGURAÇÃO ---
 # O JID (ID do WhatsApp) deve ser o seu número seguido de @s.whatsapp.net ou @lid
 # Se preferir, crie um arquivo .env ou defina a variável de ambiente MY_WHATSAPP_JID
-MY_JID = os.getenv("MY_WHATSAPP_JID", "554791880322@s.whatsapp.net") # Padrão para o Brum
+MY_JID = os.getenv("MY_WHATSAPP_JID", "554791880322@s.whatsapp.net") # Default JID
 LOG_PATH = r"whatsapp-bridge\bridge_log.txt"
 
 if os.path.exists(LOG_PATH):

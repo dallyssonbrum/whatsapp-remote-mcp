@@ -1,9 +1,10 @@
-﻿import time
+import time
 import requests
 import os
 
-LOG_PATH = r"C:\Users\brum9\whatsapp-mcp-server\whatsapp-bridge\bridge_log.txt"
-RECIPIENT_JID = "554791880322@s.whatsapp.net"
+# --- CONFIGURAÇÃO ---
+LOG_PATH = r"whatsapp-bridge\bridge_log.txt"
+RECIPIENT_JID = os.getenv("MY_WHATSAPP_JID", "554791880322@s.whatsapp.net")
 API_URL = "http://localhost:8080/api/send"
 
 def send_msg(text):
@@ -17,7 +18,7 @@ if os.path.exists(LOG_PATH):
 else:
     size = 0
 
-print(f"Monitoramento Brum Ativo. Ouvindo {LOG_PATH}...")
+print(f"Monitoramento Ativo. Ouvindo {LOG_PATH} para o JID {RECIPIENT_JID}...")
 
 while True:
     try:
@@ -31,7 +32,9 @@ while True:
             size = f.tell()
             
             for line in lines:
-                if ("213618872287271" in line or "554791880322" in line) and (":" in line):
+                # Extrai o ID numérico do JID para busca flexível
+                my_number = RECIPIENT_JID.split("@")[0]
+                if my_number in line and ":" in line:
                     if "Li seu comando" in line or "Monitoramento ultra-estavel" in line:
                         continue
                         
@@ -40,7 +43,7 @@ while True:
                         content = parts[-1].strip()
                         if content:
                             print(f"Detectado via LOG: {content}")
-                            send_msg(f"Brum! Li seu comando via log (estavel): '{content}'. Monitoramento 100% ativo!")
+                            send_msg(f"Comando recebido via log: '{content}'. Monitoramento ativo!")
     except Exception as e:
         pass
     time.sleep(1)
