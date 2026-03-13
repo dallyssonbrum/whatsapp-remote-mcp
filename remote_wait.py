@@ -1,54 +1,83 @@
 import time
 import os
-from dotenv import load_dotenv
+import sys
+import re
 
-# Carrega variáveis do arquivo .env se ele existir
-load_dotenv()
+BRUM_IDS = ["213618872287271", "554791880322"]
+LOG_PATH = "whatsapp-bridge/bridge_log.txt"
 
-# --- CONFIGURAÇÃO ---
+print(f"--- Monitoramento Remoto v19 (Keep-Alive + Deactivation) ---")
+print(f"Sincronizado com: {BRUM_IDS}")
+sys.stdout.flush()
 
-# O JID (ID do WhatsApp) deve ser o seu n�mero seguido de @s.whatsapp.net ou @lid
-# Se preferir, crie um arquivo .env ou defina a vari�vel de ambiente MY_WHATSAPP_JID
-MY_JID = os.getenv("MY_WHATSAPP_JID", "YOUR_WHATSAPP_JID@s.whatsapp.net") # Default JID
-LOG_PATH = os.getenv("BRIDGE_LOG_PATH", "whatsapp-bridge/bridge_log.txt")
+processed_lines = set()
 
+# Pre-carrega histórico
 if os.path.exists(LOG_PATH):
-    size = os.path.getsize(LOG_PATH)
-else:
-    size = 0
+    with open(LOG_PATH, "rb") as f:
+        content = f.read().decode("utf-8", "ignore")
+        for line in content.splitlines():
+            processed_lines.add(line.strip())
 
-print(f"--- Monitoramento Remoto Ativado para JID: {MY_JID} ---")
-print("Aguardando comando via WhatsApp...")
+print("Aguardando seu comando... (Envie uma nova mensagem agora)")
+sys.stdout.flush()
 
-last_heartbeat = time.time()
+start_time = time.time()
+last_status_time = time.time()
 
-while True:
-    # Heartbeat a cada 60 segundos para evitar timeout do terminal/agente
-    if time.time() - last_heartbeat > 60:
-        print("[Sinal de Vida] Aguardando novos comandos...")
-        last_heartbeat = time.time()
+try:
+    while True:
+        # Mensagem de Keep-Alive a cada 60 segundos para evitar timeout da ferramenta
+        current_time = time.time()
+        if current_time - last_status_time > 60:
+            uptime = int((current_time - start_time) / 60)
+            print(f"... Monitoramento ativo (Uptime: {uptime} min) ...")
+            sys.stdout.flush()
+            last_status_time = current_time
 
-    if os.path.exists(LOG_PATH):
-        with open(LOG_PATH, "r", encoding="utf-8", errors="ignore") as f:
-            f.seek(size)
-            lines = f.readlines()
-            size = f.tell()
-            for line in lines:
-                # Extrai o ID num�rico do JID para busca flex�vel
-                my_number = MY_JID.split("@")[0]
-                if my_number in line and ":" in line:
-                    if "Message sent" in line or "Received request" in line:
+        if os.path.exists(LOG_PATH):
+            with open(LOG_PATH, "rb") as f:
+                content = f.read().decode("utf-8", "ignore")
+                lines = content.splitlines()
+                
+                for line in lines:
+                    original_line = line.strip()
+                    if not original_line or original_line in processed_lines:
                         continue
-                    parts = line.split(":")
-                    if len(parts) > 3:
-                        cmd = parts[-1].strip()
-                        print(f"--- NOVO COMANDO RECEBIDO: {cmd} ---")
-                        
-                        # Comando Especial para Sair
-                        if "encerrar controle remoto" in cmd.lower():
-                            print("Comando de encerramento recebido. Desligando...")
-                            exit(0)
-                        
-                        # Sai do loop para o Agente processar o comando
-                        exit(0)
-    time.sleep(2)
+                    
+                    # LOG_RAW para acompanhamento em tempo real
+                    print(f"LOG_RAW: {original_line}")
+                    sys.stdout.flush()
+                    processed_lines.add(original_line)
+                    
+                    # 1. Limpa a linha deixando apenas Letras e Números (remove espaços e lixo invisível)
+                    alnum_only = re.sub(r"[^a-zA-Z0-9]", "", original_line)
+                    
+                    # 2. Ignora logs técnicos conhecidos
+                    if any(x in alnum_only for x in ["Usingexisting", "messagesent", "ClientINFO", "ConnectedtoWhatsApp"]):
+                        continue
+
+                    # 3. Limpa a linha deixando APENAS números para conferir seu ID
+                    numbers_only = re.sub(r"\D", "", original_line)
+                    
+                    for bid in BRUM_IDS:
+                        if bid in original_line or bid in numbers_only:
+                            # Detectar protocolo de desativação
+                            if "Encerrar Controle Remoto" in original_line:
+                                print("\n" + "X"*50)
+                                print("!!! DESATIVAÇÃO REMOTA SOLICITADA PELO WHATSAPP !!!")
+                                print("X"*50 + "\n")
+                                sys.stdout.flush()
+                                sys.exit(99) # Código de saída especial para desativação
+
+                            # Se chegamos aqui, é uma mensagem real!
+                            print("\n" + "!"*50)
+                            print(f"!!! COMANDO CAPTURADO COM SUCESSO: {original_line}")
+                            print("!"*50 + "\n")
+                            sys.stdout.flush()
+                            sys.exit(0)
+        
+        time.sleep(0.5)
+except Exception as e:
+    print(f"Erro: {e}")
+    sys.stdout.flush()

@@ -53,8 +53,8 @@ func NewMessageStore() (*MessageStore, error) {
 		return nil, fmt.Errorf("failed to create store directory: %v", err)
 	}
 
-	// Open SQLite database for messages
-	db, err := sql.Open("sqlite", "store/messages.db")
+	// Open SQLite database for messages with busy timeout
+	db, err := sql.Open("sqlite", "file:store/messages.db?_pragma=busy_timeout(5000)&_pragma=journal_mode(WAL)")
 	if err != nil {
 		return nil, fmt.Errorf("failed to open message database: %v", err)
 	}
@@ -410,8 +410,12 @@ func extractMediaInfo(msg *waProto.Message) (mediaType string, filename string, 
 
 // Handle regular incoming messages with media support
 func handleMessage(client *whatsmeow.Client, messageStore *MessageStore, msg *events.Message, logger waLog.Logger) {
-	// Save message to database
+	// Skip messages from groups
 	chatJID := msg.Info.Chat.String()
+	if strings.Contains(chatJID, "@g.us") {
+		return
+	}
+	
 	sender := msg.Info.Sender.User
 
 	// Get appropriate chat name (pass nil for conversation since we don't have one for regular messages)
@@ -800,7 +804,7 @@ func main() {
 		return
 	}
 
-	container, err := sqlstore.New(context.Background(), "sqlite", "store/whatsapp.db?_pragma=foreign_keys(1)", dbLog)
+	container, err := sqlstore.New(context.Background(), "sqlite", "file:store/whatsapp.db?_pragma=foreign_keys(1)&_pragma=busy_timeout(5000)&_pragma=journal_mode(WAL)", dbLog)
 	if err != nil {
 		logger.Errorf("Failed to connect to database: %v", err)
 		return
@@ -859,31 +863,71 @@ func main() {
 	// Connect to WhatsApp
 	if client.Store.ID == nil {
 		// No ID stored, this is a new client, need to pair with phone
-		qrChan, _ := client.GetQRChannel(context.Background())
-		err = client.Connect()
-		if err != nil {
-			logger.Errorf("Failed to connect: %v", err)
-			return
-		}
+		pairingNumber := os.Getenv("PAIRING_NUMBER")
 
-		// Print QR code for pairing with phone
-		for evt := range qrChan {
-			if evt.Event == "code" {
-				fmt.Println("\nScan this QR code with your WhatsApp app:")
-				qrterminal.GenerateHalfBlock(evt.Code, qrterminal.L, os.Stdout)
-			} else if evt.Event == "success" {
-				connected <- true
-				break
+		if pairingNumber != "" {
+			// Use Pairing Code (8-digit)
+			fmt.Printf("\n--- PAIRING MODE ACTIVATED ---\n")
+			fmt.Printf("Using phone number: %s\n", pairingNumber)
+
+			err = client.Connect()
+			if err != nil {
+				logger.Errorf("Failed to connect: %v", err)
+				return
 			}
-		}
 
-		// Wait for connection
-		select {
-		case <-connected:
-			fmt.Println("\nSuccessfully connected and authenticated!")
-		case <-time.After(3 * time.Minute):
-			logger.Errorf("Timeout waiting for QR code scan")
-			return
+			code, err := client.PairPhone(context.Background(), pairingNumber, true, whatsmeow.PairClientChrome, "Gemini Bridge")
+			if err != nil {
+				logger.Errorf("Failed to get pairing code: %v", err)
+				return
+			}
+
+			fmt.Printf("\n--- YOUR PAIRING CODE ---\n")
+			fmt.Printf("      %s\n", code)
+			fmt.Printf("--------------------------\n")
+			fmt.Println("Steps:")
+			fmt.Println("1. Open WhatsApp on your phone.")
+			fmt.Println("2. Go to Settings > Linked Devices > Link a Device.")
+			fmt.Println("3. Select 'Link with phone number instead'.")
+			fmt.Println("4. Enter the 8-digit code above.")
+
+			// Wait for connection success via event handler or timeout
+			select {
+			case <-connected:
+				fmt.Println("\nSuccessfully connected and authenticated via Pairing Code!")
+			case <-time.After(5 * time.Minute):
+				logger.Errorf("Timeout waiting for Pairing Code authentication")
+				return
+			}
+		} else {
+			// Default QR Code method
+			qrChan, _ := client.GetQRChannel(context.Background())
+			err = client.Connect()
+			if err != nil {
+				logger.Errorf("Failed to connect: %v", err)
+				return
+			}
+
+			// Print QR code for pairing with phone
+			for evt := range qrChan {
+				if evt.Event == "code" {
+					fmt.Printf("\n--- QR_CODE_DATA:%s ---\n", evt.Code)
+					fmt.Println("\nScan this QR code with your WhatsApp app:")
+					qrterminal.GenerateHalfBlock(evt.Code, qrterminal.L, os.Stdout)
+				} else if evt.Event == "success" {
+					connected <- true
+					break
+				}
+			}
+
+			// Wait for connection
+			select {
+			case <-connected:
+				fmt.Println("\nSuccessfully connected and authenticated!")
+			case <-time.After(3 * time.Minute):
+				logger.Errorf("Timeout waiting for QR code scan")
+				return
+			}
 		}
 	} else {
 		// Already logged in, just connect
