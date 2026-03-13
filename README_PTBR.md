@@ -16,12 +16,21 @@ Esta versão inclui um recurso personalizado de **Controle Remoto** que permite 
 
 ### Como usar:
 
-1.  **Configure seu JID**: Abra o arquivo `remote_wait.py` e coloque seu número do WhatsApp na variável `MY_JID` (ex: `YOUR_PHONE_NUMBER@s.whatsapp.net`).
-2.  **Inicie o Bridge**: Rode o bridge em Go em um terminal (`go run .` dentro da pasta `whatsapp-bridge`).
-3.  **Inicie o Monitoramento**: Rode o script Python em outro terminal:
+1.  **Inicie o Bridge**: Rode o bridge em Go em um terminal (`go run .` dentro da pasta `whatsapp-bridge`).
+2.  **Encontre seu JID**: Para descobrir seu ID único do WhatsApp (JID/LID), envie qualquer mensagem para você mesmo no WhatsApp e depois execute:
+    ```bash
+    python check_my_id.py
+    ```
+    Copie o JID que corresponde ao seu número (ex: `123456789@s.whatsapp.net` ou `123456789@lid`).
+3.  **Configure seu JID**: Coloque esse valor na variável `MY_JID` dentro do arquivo `remote_wait.py` ou use uma variável de ambiente:
+    ```powershell
+    $env:MY_WHATSAPP_JID = "seu_jid_aqui"
+    ```
+4.  **Inicie o Monitoramento**: Rode o script Python em outro terminal:
     ```bash
     python remote_wait.py
     ```
+
 4.  **Envie Comandos**: Envie mensagens do seu celular para o seu próprio número. O agente detectará os comandos no log e os executará (ex: "Abrir Google", "Mover o mouse", "Verificar espaço em disco").
 
 ### Recursos de Segurança:
