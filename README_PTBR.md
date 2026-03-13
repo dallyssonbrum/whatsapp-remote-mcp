@@ -40,6 +40,27 @@ Esta versão inclui um recurso personalizado de **Controle Remoto** que permite 
 
 ---
 
+## 🤖 Usando com ChatGPT Plus / OpenAI
+
+Se você é usuário do **ChatGPT Plus**, você também pode usar este projeto! Embora o aplicativo desktop do ChatGPT ainda não suporte MCP nativamente como o Claude, você tem três ótimas opções:
+
+### 1. Via Cursor ou VS Code (Recomendado para Desenvolvedores)
+Se você usa o editor **Cursor** ou a extensão **Roo Code (antigo Claude Dev)** no VS Code:
+- Configure o servidor MCP nas configurações.
+- Selecione o seu modelo da OpenAI (GPT-4o, etc.).
+- O editor usará as ferramentas MCP automaticamente para interagir com seu WhatsApp.
+
+### 2. Via Custom GPT Actions (Sem necessidade de código)
+Você pode criar um **Custom GPT** na sua conta do ChatGPT Plus:
+1. Use uma ferramenta como o [ngrok](https://ngrok.com/) para expor seu bridge local (`localhost:8080`) para a internet.
+2. Nas configurações de "Actions" do seu Custom GPT, importe o esquema da API fornecido pelo bridge.
+3. Seu Custom GPT agora poderá enviar e ler mensagens diretamente da interface do ChatGPT (web ou mobile).
+
+### 3. Via Pontes MCP-para-OpenAI
+Existem ferramentas da comunidade que permitem "conectar" qualquer servidor MCP à interface do ChatGPT. Verifique a [lista da comunidade MCP](https://modelcontextprotocol.io/community) para os conectores mais recentes.
+
+---
+
 ## Instalação
 
 ### Pré-requisitos
