@@ -1,6 +1,6 @@
-﻿# Gemini CLI - Manual de Boot do Terminal Remoto AUTÔNOMO (Brum)
+# Gemini CLI - Manual de Boot do Terminal Remoto AUTÔNOMO
 
-Este projeto foi configurado para que o Brum possa operar o terminal do seu computador remotamente via WhatsApp de forma 100% autônoma (Modo YOLO).
+Este projeto foi configurado para operar o terminal do seu computador remotamente via WhatsApp de forma 100% autônoma (Modo YOLO).
 
 ## Procedimento de Inicialização:
 1.  **Abrir o Terminal (PowerShell) como Administrador.**
@@ -8,16 +8,21 @@ Este projeto foi configurado para que o Brum possa operar o terminal do seu comp
     ```powershell
     gemini --approval-mode yolo
     ```
-    *(Isso desabilita o prompt de confirmação "1" para todos os comandos).*
+    *(Isso desabilita o prompt de confirmação para todos os comandos).*
 
 ## Após o Início, o Agente Gemini executará:
 1.  **WhatsApp Bridge (Go):**
-    - Ir para: `C:\Users\brum9\whatsapp-mcp-server\whatsapp-bridge`
-    - Definir `$env:CGO_ENABLED=1`
-    - Rodar: `go run main.go` com saída para `bridge_log.txt`.
+    - Ir para a pasta `whatsapp-bridge`
+    - Definir a variável de ambiente `CGO_ENABLED=1`
+    - Rodar o bridge em Go redirecionando a saída para `bridge_log.txt`.
 2.  **Modo de Vigilância Ativa:**
-    - O Agente Gemini iniciará o script `remote_wait.py` para aguardar comandos do Brum.
+    - O Agente Gemini iniciará o script `remote_wait.py` para aguardar comandos via WhatsApp.
 
 ## Segurança e Autonomia:
-- **Modo YOLO:** Ativado via flag `--approval-mode yolo` para permitir que o Brum controle o PC pelo WhatsApp sem precisar tocar no teclado do computador.
-- **Identidades Autorizadas:** 554791880322 (Brum) e 213618872287271 (LID).
+- **Modo YOLO:** Ativado via flag `--approval-mode yolo` para permitir o controle do PC pelo WhatsApp sem precisar tocar no teclado do computador.
+- **Configuração de Variáveis de Ambiente:**
+  - `MY_WHATSAPP_JID`: Seu JID pessoal (ex: `554791880322@s.whatsapp.net`).
+  - `WHATSAPP_DB_PATH`: Caminho para o banco de dados (default: `whatsapp-bridge/store/messages.db`).
+  - `TARGET_PHONE`: Número de telefone para filtros (ex: `554791880322`).
+  - `TARGET_LID`: ID LID para filtros (ex: `213618872287271`).
+- **Identidades Autorizadas:** Configure o seu JID através da variável de ambiente `MY_WHATSAPP_JID` ou diretamente nos scripts.

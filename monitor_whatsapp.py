@@ -2,9 +2,9 @@
 import time
 import os
 
-DB_PATH = r"C:\Users\brum9\whatsapp-mcp-server\whatsapp-bridge\store\messages.db"
+DB_PATH = os.getenv("WHATSAPP_DB_PATH", "whatsapp-bridge/store/messages.db")
 # O seu JID pessoal baseado no número fornecido
-TARGET_JID = "5547991880322@s.whatsapp.net" 
+TARGET_JID = os.getenv("TARGET_JID", "554791880322@s.whatsapp.net") 
 
 def get_last_msg_id():
     try:

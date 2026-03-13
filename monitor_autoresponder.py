@@ -1,11 +1,16 @@
 ﻿import sqlite3
 import time
 import requests
+import os
 
-DB_PATH = "file:C:/Users/brum9/whatsapp-mcp-server/whatsapp-bridge/store/messages.db?mode=ro"
-RECIPIENT_JID = "554791880322@s.whatsapp.net"
-MONITOR_NUMBERS = ["4791880322", "213618872287271"] # Filtro por numeros chave
-API_URL = "http://localhost:8080/api/send"
+DB_PATH = os.getenv("WHATSAPP_DB_PATH", "file:whatsapp-bridge/store/messages.db?mode=ro")
+RECIPIENT_JID = os.getenv("RECIPIENT_JID", "554791880322@s.whatsapp.net")
+# Filtro por numeros chave
+MONITOR_NUMBERS = [
+    os.getenv("TARGET_PHONE", "554791880322"), 
+    os.getenv("TARGET_LID", "213618872287271")
+]
+API_URL = os.getenv("BRIDGE_API_URL", "http://localhost:8080/api/send")
 
 def send_msg(text):
     try:

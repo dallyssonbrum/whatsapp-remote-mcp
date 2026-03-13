@@ -1,8 +1,10 @@
 ﻿import sqlite3
 import time
 import requests
+import os
 
-DB_PATH = r"C:\Users\brum9\whatsapp-mcp-server\whatsapp-bridge\store\messages.db"
+DB_PATH = os.getenv("WHATSAPP_DB_PATH", "whatsapp-bridge/store/messages.db")
+RECIPIENT_JID = os.getenv("RECIPIENT_JID", "554791880322@s.whatsapp.net")
 
 def get_last_msg():
     try:
@@ -24,7 +26,7 @@ while True:
         print(f"MENSAGEM DETECTADA: {current[1]}")
         # Tenta responder via bridge
         try:
-            requests.post("http://localhost:8080/api/send", json={"recipient": "5547991880322@s.whatsapp.net", "message": f"Respondendo via monitor simples: {current[1]}"}, timeout=5)
+            requests.post("http://localhost:8080/api/send", json={"recipient": RECIPIENT_JID, "message": f"Respondendo via monitor simples: {current[1]}"}, timeout=5)
         except:
             pass
     time.sleep(2)

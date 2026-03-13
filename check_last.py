@@ -1,5 +1,8 @@
 ﻿import sqlite3
-conn = sqlite3.connect(r"C:\Users\brum9\whatsapp-mcp-server\whatsapp-bridge\store\messages.db")
+import os
+
+DB_PATH = os.getenv("WHATSAPP_DB_PATH", "whatsapp-bridge/store/messages.db")
+conn = sqlite3.connect(DB_PATH)
 rows = conn.execute("SELECT sender, content, timestamp FROM messages WHERE is_from_me = 0 ORDER BY timestamp DESC LIMIT 10").fetchall()
 print("--- LOG DE MENSAGENS NO BANCO ---")
 for r in rows:
