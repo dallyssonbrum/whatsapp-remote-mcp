@@ -86,25 +86,28 @@ Here's an example of what you can do when it's connected to Claude.
 
 ### Windows Compatibility
 
-If you're running this project on Windows, be aware that `go-sqlite3` requires **CGO to be enabled** in order to compile and work properly. By default, **CGO is disabled on Windows**, so you need to explicitly enable it and have a C compiler installed.
+... (conteúdo anterior) ...
 
-#### Steps to get it working:
+## 🚀 Remote Control Mode (Brum Edition)
 
-1. **Install a C compiler**  
-   We recommend using [MSYS2](https://www.msys2.org/) to install a C compiler for Windows. After installing MSYS2, make sure to add the `ucrt64\bin` folder to your `PATH`.  
-   → A step-by-step guide is available [here](https://code.visualstudio.com/docs/cpp/config-mingw).
+This version includes a custom **Remote Control** feature that allows you to control your PC via WhatsApp messages.
 
-2. **Enable CGO and run the app**
+### How to use it:
 
+1. **Configure your JID**: Open `remote_wait.py` and set your WhatsApp number in the `MY_JID` variable (e.g., `554791880322@s.whatsapp.net`).
+2. **Start the Bridge**: Run the Go bridge in one terminal (`go run .`).
+3. **Start Monitoring**: Run the Python script in another terminal:
    ```bash
-   cd whatsapp-bridge
-   go env -w CGO_ENABLED=1
-   go run main.go
+   python remote_wait.py
    ```
+4. **Send Commands**: Send messages from your phone to your own WhatsApp account. The agent will detect the commands in the log and execute them (e.g., "Open Google", "Move the mouse", "Check disk space").
 
-Without this setup, you'll likely run into errors like:
+### Safety Features:
+- **JID Filtering**: The script only listens to the specific number you configured.
+- **Heartbeat**: It sends a "signal of life" every 60 seconds to prevent session timeouts.
+- **Remote Shutdown**: Send "Encerrar Controle Remoto" to stop the monitoring remotely.
 
-> `Binary was compiled with 'CGO_ENABLED=0', go-sqlite3 requires cgo to work.`
+> **Caution:** This feature gives the AI agent permission to execute shell commands and control your mouse/keyboard. Use it responsibly and only with trusted LLMs.
 
 ## Architecture Overview
 
