@@ -4,7 +4,7 @@ import os
 
 # --- CONFIGURAÇÃO ---
 LOG_PATH = r"whatsapp-bridge\bridge_log.txt"
-RECIPIENT_JID = os.getenv("MY_WHATSAPP_JID", "554791880322@s.whatsapp.net")
+RECIPIENT_JID = os.getenv("MY_WHATSAPP_JID", "YOUR_PHONE_NUMBER@s.whatsapp.net")
 API_URL = "http://localhost:8080/api/send"
 
 def send_msg(text):

@@ -21,8 +21,8 @@ Este projeto foi configurado para operar o terminal do seu computador remotament
 ## Segurança e Autonomia:
 - **Modo YOLO:** Ativado via flag `--approval-mode yolo` para permitir o controle do PC pelo WhatsApp sem precisar tocar no teclado do computador.
 - **Configuração de Variáveis de Ambiente:**
-  - `MY_WHATSAPP_JID`: Seu JID pessoal (ex: `554791880322@s.whatsapp.net`).
+  - `MY_WHATSAPP_JID`: Seu JID pessoal (ex: `YOUR_PHONE_NUMBER@s.whatsapp.net`).
   - `WHATSAPP_DB_PATH`: Caminho para o banco de dados (default: `whatsapp-bridge/store/messages.db`).
-  - `TARGET_PHONE`: Número de telefone para filtros (ex: `554791880322`).
-  - `TARGET_LID`: ID LID para filtros (ex: `213618872287271`).
+  - `TARGET_PHONE`: Número de telefone para filtros (ex: `YOUR_PHONE_NUMBER`).
+  - `TARGET_LID`: ID LID para filtros (ex: `YOUR_LID_NUMBER`).
 - **Identidades Autorizadas:** Configure o seu JID através da variável de ambiente `MY_WHATSAPP_JID` ou diretamente nos scripts.

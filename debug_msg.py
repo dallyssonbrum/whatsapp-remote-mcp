@@ -1,4 +1,4 @@
-﻿import sqlite3
+import sqlite3
 import os
 
 DB_PATH = os.getenv("WHATSAPP_DB_PATH", "whatsapp-bridge/store/messages.db")

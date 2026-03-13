@@ -1,10 +1,10 @@
-Ôªøimport time
+import time
 import os
 
-# --- CONFIGURA√á√ÉO ---
-# O JID (ID do WhatsApp) deve ser o seu n√∫mero seguido de @s.whatsapp.net ou @lid
-# Se preferir, crie um arquivo .env ou defina a vari√°vel de ambiente MY_WHATSAPP_JID
-MY_JID = os.getenv("MY_WHATSAPP_JID", "554791880322@s.whatsapp.net") # Default JID
+# --- CONFIGURA«√O ---
+# O JID (ID do WhatsApp) deve ser o seu n˙mero seguido de @s.whatsapp.net ou @lid
+# Se preferir, crie um arquivo .env ou defina a vari·vel de ambiente MY_WHATSAPP_JID
+MY_JID = os.getenv("MY_WHATSAPP_JID", "YOUR_WHATSAPP_JID@s.whatsapp.net") # Default JID
 LOG_PATH = os.getenv("BRIDGE_LOG_PATH", "whatsapp-bridge/bridge_log.txt")
 
 if os.path.exists(LOG_PATH):
@@ -29,7 +29,7 @@ while True:
             lines = f.readlines()
             size = f.tell()
             for line in lines:
-                # Extrai o ID num√©rico do JID para busca flex√≠vel
+                # Extrai o ID numÈrico do JID para busca flexÌvel
                 my_number = MY_JID.split("@")[0]
                 if my_number in line and ":" in line:
                     if "Message sent" in line or "Received request" in line:

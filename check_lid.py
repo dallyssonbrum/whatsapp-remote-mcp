@@ -1,8 +1,8 @@
-﻿import sqlite3
+import sqlite3
 import os
 
 DB_PATH = os.getenv("WHATSAPP_DB_PATH", "whatsapp-bridge/store/messages.db")
-TARGET_LID = os.getenv("TARGET_LID", "213618872287271")
+TARGET_LID = os.getenv("TARGET_LID", "YOUR_LID_NUMBER")
 
 conn = sqlite3.connect(DB_PATH)
 query = f"SELECT timestamp, content FROM messages WHERE chat_jid LIKE '%{TARGET_LID}%' ORDER BY timestamp DESC LIMIT 5"

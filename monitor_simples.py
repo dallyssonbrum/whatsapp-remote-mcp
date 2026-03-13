@@ -1,10 +1,10 @@
-﻿import sqlite3
+import sqlite3
 import time
 import requests
 import os
 
 DB_PATH = os.getenv("WHATSAPP_DB_PATH", "whatsapp-bridge/store/messages.db")
-RECIPIENT_JID = os.getenv("RECIPIENT_JID", "554791880322@s.whatsapp.net")
+RECIPIENT_JID = os.getenv("RECIPIENT_JID", "YOUR_PHONE_NUMBER@s.whatsapp.net")
 
 def get_last_msg():
     try:

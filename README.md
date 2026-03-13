@@ -90,7 +90,7 @@ This version includes a custom **Remote Control** feature that allows you to con
 
 ### How to use it:
 
-1. **Configure your JID**: Open `remote_wait.py` and set your WhatsApp number in the `MY_JID` variable (e.g., `554791880322@s.whatsapp.net`).
+1. **Configure your JID**: Open `remote_wait.py` and set your WhatsApp number in the `MY_JID` variable (e.g., `YOUR_PHONE_NUMBER@s.whatsapp.net`).
 2. **Start the Bridge**: Run the Go bridge in one terminal (`go run .`).
 3. **Start Monitoring**: Run the Python script in another terminal:
    ```bash

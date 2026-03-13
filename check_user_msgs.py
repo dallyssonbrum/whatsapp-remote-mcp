@@ -1,11 +1,11 @@
-﻿import sqlite3
+import sqlite3
 import os
 
 DB_PATH = os.getenv("WHATSAPP_DB_PATH", "whatsapp-bridge/store/messages.db")
-TARGET_PHONE = os.getenv("TARGET_PHONE", "554791880322")
+TARGET_PHONE = os.getenv("TARGET_PHONE", "YOUR_PHONE_NUMBER")
 
 conn = sqlite3.connect(DB_PATH)
-# Busca mensagens onde o chat_jid OU o sender seja o seu número
+# Busca mensagens onde o chat_jid OU o sender seja o seu n�mero
 query = f"SELECT timestamp, sender, is_from_me, content FROM messages WHERE chat_jid LIKE '%{TARGET_PHONE}%' OR sender LIKE '%{TARGET_PHONE}%' ORDER BY timestamp DESC LIMIT 10"
 rows = conn.execute(query).fetchall()
 print(f"--- MENSAGENS DO USUARIO ({TARGET_PHONE}) NO BANCO ATUAL ---")
