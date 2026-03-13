@@ -1,4 +1,6 @@
-# WhatsApp MCP Server
+# WhatsApp MCP Server (Brum Edition)
+
+[Leia em Português (PT-BR)](./README_PTBR.md)
 
 This is a Model Context Protocol (MCP) server for WhatsApp.
 
