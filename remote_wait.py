@@ -1,9 +1,14 @@
 import time
 import os
+from dotenv import load_dotenv
 
-# --- CONFIGURAÇÃO ---
-# O JID (ID do WhatsApp) deve ser o seu número seguido de @s.whatsapp.net ou @lid
-# Se preferir, crie um arquivo .env ou defina a variável de ambiente MY_WHATSAPP_JID
+# Carrega variÃ¡veis do arquivo .env se ele existir
+load_dotenv()
+
+# --- CONFIGURAÃ‡ÃƒO ---
+
+# O JID (ID do WhatsApp) deve ser o seu nï¿½mero seguido de @s.whatsapp.net ou @lid
+# Se preferir, crie um arquivo .env ou defina a variï¿½vel de ambiente MY_WHATSAPP_JID
 MY_JID = os.getenv("MY_WHATSAPP_JID", "YOUR_WHATSAPP_JID@s.whatsapp.net") # Default JID
 LOG_PATH = os.getenv("BRIDGE_LOG_PATH", "whatsapp-bridge/bridge_log.txt")
 
@@ -29,7 +34,7 @@ while True:
             lines = f.readlines()
             size = f.tell()
             for line in lines:
-                # Extrai o ID numérico do JID para busca flexível
+                # Extrai o ID numï¿½rico do JID para busca flexï¿½vel
                 my_number = MY_JID.split("@")[0]
                 if my_number in line and ":" in line:
                     if "Message sent" in line or "Received request" in line:
