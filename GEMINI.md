@@ -29,3 +29,6 @@ Este projeto foi configurado para operar o terminal do seu computador remotament
   - `TARGET_PHONE`: Número de telefone para filtros (ex: `YOUR_PHONE_NUMBER`).
   - `TARGET_LID`: ID LID para filtros (ex: `YOUR_LID_NUMBER`).
 - **Identidades Autorizadas:** Configure o seu JID através da variável de ambiente `MY_WHATSAPP_JID` ou diretamente nos scripts.
+
+## Histórico de Versões Estáveis:
+- **Versão Estável Controle Remoto Brum (v30)**: O script `remote_wait.py` agora utiliza a regra de **Banco de Dados Estrita**. O comando só é válido se `is_from_me = 1` E `chat_jid == sender` (Self-Chat real no SQLite). Esta lógica é imune a caracteres de terminal corrompidos e à ordem das linhas de log técnicas. Mantém Keep-Alive e Brute Force Match. Esta é a nova base de segurança para uso remoto.
