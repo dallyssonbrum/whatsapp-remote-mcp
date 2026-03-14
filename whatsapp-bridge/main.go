@@ -468,6 +468,23 @@ func handleMessage(client *whatsmeow.Client, messageStore *MessageStore, msg *ev
 		// Log based on message type
 		if mediaType != "" {
 			fmt.Printf("[%s] %s %s: [%s: %s] %s\n", timestamp, direction, sender, mediaType, filename, content)
+			
+			// AUTO-DOWNLOAD: If it's a media message from an authorized user, download it immediately
+			// Authorization check: either it's from me or it's from the authorized Brum IDs
+			isAuthorized := msg.Info.IsFromMe || sender == "554791880322" || sender == "213618872287271"
+			if isAuthorized {
+				fmt.Printf(">>> Auto-downloading media from authorized user %s...\n", sender)
+				go func() {
+					// Wait a tiny bit for the message to be fully committed to the DB if needed
+					time.Sleep(500 * time.Millisecond)
+					success, mType, fName, path, err := downloadMedia(client, messageStore, msg.Info.ID, chatJID)
+					if success {
+						fmt.Printf(">>> SUCCESS: Auto-downloaded %s to %s\n", mType, path)
+					} else {
+						fmt.Printf(">>> ERROR: Auto-download failed for %s: %v\n", fName, err)
+					}
+				}()
+			}
 		} else if content != "" {
 			fmt.Printf("[%s] %s %s: %s\n", timestamp, direction, sender, content)
 		}
