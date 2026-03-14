@@ -2,82 +2,112 @@ import time
 import os
 import sys
 import re
+import sqlite3
+from datetime import datetime
 
+# Configurações
 BRUM_IDS = ["213618872287271", "554791880322"]
-LOG_PATH = "whatsapp-bridge/bridge_log.txt"
+DB_PATH = "whatsapp-bridge/store/messages.db"
 
-print(f"--- Monitoramento Remoto v19 (Keep-Alive + Deactivation) ---")
+print(f"--- Monitoramento Remoto v30 (Estrito via Banco de Dados) ---")
 print(f"Sincronizado com: {BRUM_IDS}")
+print(f"Regra: APENAS comandos enviados no seu próprio chat (Self-Chat).")
 sys.stdout.flush()
 
-processed_lines = set()
+processed_msg_ids = set()
 
-# Pre-carrega histórico
-if os.path.exists(LOG_PATH):
-    with open(LOG_PATH, "rb") as f:
-        content = f.read().decode("utf-8", "ignore")
-        for line in content.splitlines():
-            processed_lines.add(line.strip())
+def sanitize_string(s):
+    # Remove tudo que não for letra ou número para "Brute Force Match"
+    return re.sub(r'[^a-zA-Z0-9]', '', s).lower()
 
-print("Aguardando seu comando... (Envie uma nova mensagem agora)")
+TARGET_COMMAND = sanitize_string("Encerrar Controle Remoto")
+
+def get_latest_self_command():
+    """Consulta o banco de dados em busca do último comando válido no Self-Chat."""
+    if not os.path.exists(DB_PATH):
+        return None, None, None
+    
+    try:
+        # Abre em modo Read-Only para evitar conflitos com o Bridge Go no Windows
+        conn = sqlite3.connect(f"file:{DB_PATH}?mode=ro", uri=True)
+        cursor = conn.cursor()
+        
+        # Busca a última mensagem enviada por mim
+        # A regra 'chat_jid = sender' garante que é um Self-Chat
+        query = """
+            SELECT id, content, sender, chat_jid 
+            FROM messages 
+            WHERE is_from_me = 1 
+            ORDER BY timestamp DESC LIMIT 1
+        """
+        cursor.execute(query)
+        row = cursor.fetchone()
+        conn.close()
+        
+        if row:
+            msg_id, content, sender, chat_jid = row
+            
+            # Limpa JIDs para comparação (remove @s.whatsapp.net ou @lid)
+            clean_sender = re.sub(r'[^0-9]', '', sender)
+            clean_chat = re.sub(r'[^0-9]', '', chat_jid)
+            
+            # Validação Estrita: 
+            # 1. Remetente deve ser um dos IDs do Brum
+            # 2. Destinatário (Chat) deve ser o próprio Remetente (Self-Chat)
+            if clean_sender in BRUM_IDS and clean_sender == clean_chat:
+                return msg_id, content, clean_sender
+            
+        return None, None, None
+    except Exception as e:
+        # Silencioso para não poluir o terminal, mas loga erro se for crítico
+        if "locked" not in str(e).lower():
+            print(f"[Erro DB]: {e}")
+        return None, None, None
+
+# Pre-carrega a última mensagem para não executar comandos antigos ao iniciar
+last_id, _, _ = get_latest_self_command()
+if last_id:
+    processed_msg_ids.add(last_id)
+
+print("Aguardando novas mensagens no seu Self-Chat...")
 sys.stdout.flush()
 
-start_time = time.time()
-last_status_time = time.time()
+last_keepalive = time.time()
 
 try:
     while True:
-        # Mensagem de Keep-Alive a cada 60 segundos para evitar timeout da ferramenta
-        current_time = time.time()
-        if current_time - last_status_time > 60:
-            uptime = int((current_time - start_time) / 60)
-            print(f"... Monitoramento ativo (Uptime: {uptime} min) ...")
+        # Keep-Alive: evita timeout de 5 minutos do Gemini CLI
+        now = time.time()
+        if now - last_keepalive > 60:
+            print(f"[Keep-Alive] {time.strftime('%H:%M:%S')} - Aguardando comando no seu chat...")
             sys.stdout.flush()
-            last_status_time = current_time
+            last_keepalive = now
 
-        if os.path.exists(LOG_PATH):
-            with open(LOG_PATH, "rb") as f:
-                content = f.read().decode("utf-8", "ignore")
-                lines = content.splitlines()
-                
-                for line in lines:
-                    original_line = line.strip()
-                    if not original_line or original_line in processed_lines:
-                        continue
-                    
-                    # LOG_RAW para acompanhamento em tempo real
-                    print(f"LOG_RAW: {original_line}")
-                    sys.stdout.flush()
-                    processed_lines.add(original_line)
-                    
-                    # 1. Limpa a linha deixando apenas Letras e Números (remove espaços e lixo invisível)
-                    alnum_only = re.sub(r"[^a-zA-Z0-9]", "", original_line)
-                    
-                    # 2. Ignora logs técnicos conhecidos
-                    if any(x in alnum_only for x in ["Usingexisting", "messagesent", "ClientINFO", "ConnectedtoWhatsApp"]):
-                        continue
-
-                    # 3. Limpa a linha deixando APENAS números para conferir seu ID
-                    numbers_only = re.sub(r"\D", "", original_line)
-                    
-                    for bid in BRUM_IDS:
-                        if bid in original_line or bid in numbers_only:
-                            # Detectar protocolo de desativação
-                            if "Encerrar Controle Remoto" in original_line:
-                                print("\n" + "X"*50)
-                                print("!!! DESATIVAÇÃO REMOTA SOLICITADA PELO WHATSAPP !!!")
-                                print("X"*50 + "\n")
-                                sys.stdout.flush()
-                                sys.exit(99) # Código de saída especial para desativação
-
-                            # Se chegamos aqui, é uma mensagem real!
-                            print("\n" + "!"*50)
-                            print(f"!!! COMANDO CAPTURADO COM SUCESSO: {original_line}")
-                            print("!"*50 + "\n")
-                            sys.stdout.flush()
-                            sys.exit(0)
+        # Consulta o Banco
+        msg_id, content, sender_jid = get_latest_self_command()
         
-        time.sleep(0.5)
+        if msg_id and msg_id not in processed_msg_ids:
+            processed_msg_ids.add(msg_id)
+            
+            print(f"\n✅ [COMANDO DETECTADO]: '{content}' (via Self-Chat: {sender_jid})")
+            
+            # Validação do comando de encerramento (Brute Force Match)
+            sanitized_content = sanitize_string(content)
+            if TARGET_COMMAND in sanitized_content:
+                print("\n!!! DESATIVACAO REMOTA SOLICITADA !!!\n")
+                sys.stdout.flush()
+                sys.exit(99)
+
+            print("\n" + "!"*50)
+            print(f"!!! COMANDO CAPTURADO COM SUCESSO !!!")
+            print("!"*50 + "\n")
+            sys.stdout.flush()
+            sys.exit(0)
+        
+        time.sleep(1) # Intervalo de 1 segundo entre consultas ao banco
+
+except KeyboardInterrupt:
+    print("\nMonitoramento encerrado pelo usuário.")
 except Exception as e:
-    print(f"Erro: {e}")
+    print(f"Erro Fatal no Loop: {e}")
     sys.stdout.flush()

@@ -15,8 +15,11 @@ Este projeto foi configurado para operar o terminal do seu computador remotament
     - Ir para a pasta `whatsapp-bridge`
     - Definir a variável de ambiente `CGO_ENABLED=1`
     - Rodar o bridge em Go redirecionando a saída para `bridge_log.txt`.
-2.  **Modo de Vigilância Ativa:**
-    - O Agente Gemini iniciará o script `remote_wait.py` para aguardar comandos via WhatsApp.
+2.  **Verificação de Conexão:**
+    - O Agente Gemini deve validar se o log mostra "Logged in" ou se o QR Code já foi escaneado.
+    - Se o Bridge estiver pedindo QR Code, o monitoramento remoto não deve ser iniciado até que o usuário escaneie.
+3.  **Modo de Vigilância Ativa:**
+    - Após a confirmação de conexão, o Agente Gemini iniciará o script `remote_wait.py` para aguardar comandos via WhatsApp.
 
 ## Segurança e Autonomia:
 - **Modo YOLO:** Ativado via flag `--approval-mode yolo` para permitir o controle do PC pelo WhatsApp sem precisar tocar no teclado do computador.
